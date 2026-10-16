@@ -1,1 +1,34 @@
-/* placeholder to satisfy import in main.ts */
+import type { App } from '../renderer'
+import type { Physics } from '../physics/engine'
+import type { DemoAI } from '../ai/demoAI'
+import type { HandTracker } from '../handTracker'
+
+export function setupCommandInput(ai: DemoAI, app: App, physics: Physics, handTracker: HandTracker) {
+  const input = document.getElementById('command') as HTMLInputElement
+  const button = document.getElementById('send-command') as HTMLButtonElement
+  const reset = document.getElementById('reset-scene') as HTMLButtonElement
+  const status = document.getElementById('status') as HTMLDivElement
+
+  const handleCommand = async () => {
+    const text = input.value.trim()
+    if (!text) return
+    status.textContent = 'Status: AI processing...'
+    const result = await ai.runCommand(text, app, physics)
+    status.textContent = `Status: ${result}`
+    input.value = ''
+  }
+
+  button.addEventListener('click', handleCommand)
+  input.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') void handleCommand()
+  })
+
+  reset.addEventListener('click', () => {
+    physics.clear()
+    app.clearWorld()
+    status.textContent = 'Status: scene cleared.'
+  })
+
+  input.value = 'spawn box'
+  void handleCommand()
+}

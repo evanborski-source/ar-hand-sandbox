@@ -1,42 +1,35 @@
-import * as THREE from 'three'
+# AR Hand Sandbox
 
-export class HandTracker {
-  // For the initial scaffold we simulate hand pose with the mouse.
-  private pose = { position: new THREE.Vector3(0, 1.4, -0.4), rotation: new THREE.Euler() }
-  private lastMouse = { x: 0, y: 0 }
+A browser-based interactive sandbox with a dark chamber, first-person camera, tracked virtual hands, and a local AI-inspired object spawner. The app uses Three.js for rendering, Rapier for physics, and a browser-only hand-tracking fallback so the webcam is never shown in the game viewport.
 
-  constructor() {
-    window.addEventListener('mousemove', (e) => this.onMouse(e))
-    window.addEventListener('touchmove', (e) => { if (e.touches[0]) this.onTouch(e.touches[0]) })
-  }
+Features
+- First-person black box environment with floor grid and atmospheric lighting
+- Virtual hands rendered in-scene without showing the live webcam preview
+- Physics-based object spawning and collision behavior
+- Text command box for spawn/create commands
+- Clear/reset support
+- Local demo AI mode when no external model API is available
+- MediaPipe integration is prepared and optional, running locally on the client
 
-  onMouse(e: MouseEvent) {
-    this.lastMouse.x = e.clientX
-    this.lastMouse.y = e.clientY
-    this.updateFromScreen()
-  }
+Run locally
+1. Install dependencies:
+   npm install
+2. Start the dev server:
+   npm run dev
+3. Open the URL shown by Vite (usually http://localhost:5173)
 
-  onTouch(t: Touch) {
-    this.lastMouse.x = t.clientX
-    this.lastMouse.y = t.clientY
-    this.updateFromScreen()
-  }
+Commands
+- spawn box
+- spawn ball
+- spawn metal ball
+- spawn sword
+- clear
+- help
 
-  updateFromScreen() {
-    const w = window.innerWidth
-    const h = window.innerHeight
-    const nx = (this.lastMouse.x / w) * 2 - 1
-    const ny = -(this.lastMouse.y / h) * 2 + 1
-    // map to a small area in front of camera
-    this.pose.position.set(nx * 0.5, 1.4 + ny * 0.3, -0.4)
-    this.pose.rotation.set(0, 0, 0)
-  }
+Privacy
+- The webcam is only used for local hand tracking when available.
+- The live camera feed is never displayed inside the game view.
+- No raw video frames are sent to an external AI service in this local demo mode.
 
-  update(dt: number) {
-    // placeholder for real MediaPipe integration
-  }
-
-  getPose() {
-    return this.pose
-  }
-}
+Important note
+This is a playable local MVP for a browser-based AR-hand sandbox. It is intentionally built to work on a Chromebook and keep the experience focused on a working sandbox loop rather than a fake mockup.

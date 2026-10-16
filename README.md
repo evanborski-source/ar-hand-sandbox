@@ -1,29 +1,74 @@
-# AR Hand Sandbox
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  font-family: Arial, sans-serif;
+}
 
-This repository contains an initial scaffold for the AR Hand Sandbox demo.
+#canvas-root {
+  position: fixed;
+  inset: 0;
+}
 
-Features in this commit:
-- Three.js scene with black-box environment and grid floor
-- Simple stylized hand mesh rendered in first-person
-- Rapier physics scaffold (rigid bodies, basic box spawning)
-- Demo AI fallback (text-based) for spawning boxes and clearing the scene
-- Mouse-based hand pose simulator as a placeholder for MediaPipe
+#hud {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 20;
+  pointer-events: none;
+}
 
-Getting started:
+.panel {
+  pointer-events: auto;
+  background: rgba(8, 12, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+}
 
-1. Install:
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
 
-   npm install
+.subtitle,
+.tips,
+#status {
+  font-size: 12px;
+  color: #c9d6ea;
+  margin-top: 4px;
+}
 
-2. Run dev server:
+.controls {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
 
-   npm run dev
+input {
+  width: 280px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(18, 24, 30, 0.8);
+  color: white;
+}
 
-3. Open the URL shown by Vite (usually http://localhost:5173)
+button {
+  padding: 10px 14px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #6ea8ff, #4166ff);
+  color: white;
+  cursor: pointer;
+  font-weight: 600;
+}
 
-Notes / next steps:
-- Integrate MediaPipe hand tracking: replace src/handTracker.ts update() with real landmark->pose mapping.
-- Implement kinematic hand proxies and grab constraints in physics engine.
-- Add secure backend proxy for an LLM and implement structured command parsing.
-
-Privacy: this demo never displays webcam frames. When MediaPipe is integrated, the tracker should run locally and webcam data must not be uploaded to any server.
+button:last-child {
+  background: linear-gradient(135deg, #ff8d5a, #ff5d73);
+}

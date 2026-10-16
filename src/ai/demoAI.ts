@@ -1,19 +1,74 @@
+import * as RAPIER from '@dimforge/rapier3d-compat'
 import * as THREE from 'three'
-import type { App } from '../renderer'
-import type { Physics } from '../physics/engine'
+import type { App, HandPose } from '../renderer'
+import type { HandTracker } from '../handTracker'
 
-export class DemoAI {
-  async runCommand(text: string, app: App, physics: Physics) {
-    const t = text.trim().toLowerCase()
-    if (t.startsWith('spawn box') || t.startsWith('spawn a box') || t.startsWith('spawn cube')) {
-      const mesh = await app.spawnBox(0.2, new THREE.Vector3(0, 1.2, -1))
-      physics.addBox(mesh, 1)
-      return 'spawned box'
+export type PhysicsObject = {
+  mesh: THREE.Object3D
+  body: RAPIER.RigidBody
+  collider: RAPIER.Collider
+}
+
+export class Physics {
+  private app: App
+  world: RAPIER.World
+  objects: PhysicsObject[] = []
+
+  private constructor(app: App, world: RAPIER.World) {
+    this.app = app
+    this.world = world
+  }
+
+  static async create(app: App) {
+    await RAPIER.init()
+    const world = new RAPIER.World({ x: 0, y: -9.81, z: 0 })
+    return new Physics(app, world)
+  }
+
+  step(dt: number, handTracker: HandTracker) {
+    const hands = handTracker.getHands()
+    this.app.setHandPose('left', hands.left)
+    this.app.setHandPose('right', hands.right)
+
+    const iterations = Math.max(1, Math.ceil(dt * 120))
+    for (let i = 0; i < iterations; i++) {
+      this.world.step()
     }
-    if (t.startsWith('clear')) {
-      physics.clear()
-      return 'scene cleared'
+
+    for (const object of this.objects) {
+      const tx = object.body.translation()
+      const rot = object.body.rotation()
+      const mesh = object.mesh as THREE.Mesh
+      mesh.position.set(tx.x, tx.y, tx.z)
+      mesh.quaternion.set(rot.x, rot.y, rot.z, rot.w)
     }
-    return "didn't understand (demo AI)"
+  }
+
+  addObject(mesh: THREE.Object3D, options: { mass?: number; material?: 'metal' | 'rubber' | 'wood' | 'glass' | 'default' } = {}) {
+    const mass = options.mass ?? 1
+    const type = options.material ?? 'default'
+
+    const bodyDesc = RAPIER.RigidBodyDesc.dynamic().setTranslation(mesh.position.x, mesh.position.y, mesh.position.z)
+    const body = this.world.createRigidBody(bodyDesc)
+
+    const bounds = new THREE.Box3().setFromObject(mesh)
+    const size = bounds.getSize(new THREE.Vector3())
+    const half = size.multiplyScalar(0.5)
+    const colliderDesc = RAPIER.ColliderDesc.cuboid(half.x, half.y, half.z)
+    colliderDesc.setRestitution(type === 'rubber' ? 0.92 : 0.52)
+    colliderDesc.setFriction(type === 'metal' ? 0.8 : 0.4)
+    const collider = this.world.createCollider(colliderDesc, body.handle)
+
+    body.setMass(mass, true)
+    this.objects.push({ mesh, body, collider })
+    return { body, collider }
+  }
+
+  clear() {
+    for (const object of this.objects) {
+      this.world.removeRigidBody(object.body)
+      this.app.scene.remove(object.mesh)
+    }
+    this.objects = []
   }
 }

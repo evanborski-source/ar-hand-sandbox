@@ -1,30 +1,37 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
+    <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>AR Hand Sandbox</title>
     <style>
-      html,body,#app { height: 100%; margin: 0; }
-      #overlay { position: absolute; left: 12px; top: 12px; z-index: 10; color: white; }
-      .panel { background: rgba(0,0,0,0.4); padding: 8px; border-radius: 6px; }
-      #canvas-container { width: 100%; height: 100%; }
-      input, button { font-size: 14px; }
+      html, body, #app {
+        margin: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000;
+        color: #fff;
+        font-family: Arial, sans-serif;
+      }
     </style>
   </head>
   <body>
     <div id="app">
-      <div id="overlay">
+      <div id="hud">
         <div class="panel">
-          <div>
-            <input id="cmd" placeholder="Type command, e.g. 'spawn box'" />
-            <button id="send">Send</button>
-            <button id="reset">Reset</button>
+          <div class="title">AI Hand Sandbox</div>
+          <div class="subtitle">Demo mode • no webcam preview in the game world</div>
+          <div class="controls">
+            <input id="command" placeholder="Try: spawn box, spawn ball, clear, help" />
+            <button id="send-command">Run</button>
+            <button id="reset-scene">Clear</button>
           </div>
-          <div id="status">Status: initializing</div>
+          <div id="status">Status: booting...</div>
+          <div class="tips">Commands: spawn box, spawn ball, spawn sword, spawn metal ball, clear, help</div>
         </div>
       </div>
-      <div id="canvas-container"></div>
+      <div id="canvas-root"></div>
     </div>
     <script type="module" src="/src/main.ts"></script>
   </body>

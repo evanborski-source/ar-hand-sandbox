@@ -1,19 +1,20 @@
 {
   "name": "ar-hand-sandbox",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host 0.0.0.0",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview --host 0.0.0.0"
   },
   "dependencies": {
-    "three": "^0.158.0",
-    "@dimforge/rapier3d-compat": "^0.10.0"
+    "@mediapipe/tasks-vision": "^0.10.22",
+    "@dimforge/rapier3d-compat": "^0.10.0",
+    "three": "^0.165.0"
   },
   "devDependencies": {
-    "vite": "^5.0.0",
-    "typescript": "^5.0.0",
-    "@types/three": "^0.157.0"
+    "@types/three": "^0.165.0",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.2"
   }
 }

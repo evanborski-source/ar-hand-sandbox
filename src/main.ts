@@ -6,26 +6,31 @@ import { HandTracker } from './handTracker'
 import { setupCommandInput } from './ui/commandInput'
 
 async function bootstrap() {
-  const app = new App(document.getElementById('canvas-container')!)
+  const app = new App(document.getElementById('canvas-root') as HTMLElement)
   const physics = await Physics.create(app)
-  const handTracker = new HandTracker()
+  const handTracker = new HandTracker(app)
   const ai = new DemoAI()
 
-  setupCommandInput(ai, app, physics)
+  setupCommandInput(ai, app, physics, handTracker)
 
-  // Simple loop
   let last = performance.now()
   function loop(now: number) {
-    const dt = Math.min((now - last) / 1000, 0.1)
+    const dt = Math.min((now - last) / 1000, 0.05)
     last = now
+
     handTracker.update(dt)
     physics.step(dt, handTracker)
     app.render()
     requestAnimationFrame(loop)
   }
-  requestAnimationFrame(loop)
 
-  (document.getElementById('status') as HTMLElement).innerText = 'Status: ready (demo mode)'
+  requestAnimationFrame(loop)
+  const status = document.getElementById('status') as HTMLDivElement
+  status.textContent = 'Status: ready (demo sandbox mode)'
 }
 
-bootstrap()
+bootstrap().catch((e) => {
+  console.error(e)
+  const status = document.getElementById('status') as HTMLDivElement | null
+  if (status) status.textContent = 'Status: failed to initialize the sandbox.'
+})
